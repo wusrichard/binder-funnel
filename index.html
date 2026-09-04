@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>你來當一次 AI 科學家</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#F1F3EE;--ink:#101A15;--dapi:#2743C4;--fitc:#17914F;--tritc:#CC1D66;--dim:#66756D;--line:#D3DAD4}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"IBM Plex Sans TC","Space Grotesk","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+ background:var(--ground);color:var(--ink);padding:26px 20px calc(44px + env(safe-area-inset-bottom));
+ max-width:560px;margin:0 auto;-webkit-font-smoothing:antialiased}
+.num,.mono{font-family:"Space Grotesk",ui-monospace,monospace;font-feature-settings:"tnum"}
+.chips{display:flex;gap:5px;margin-bottom:16px}
+.chips i{width:9px;height:9px;border-radius:1px;display:block}
+h1{font-size:29px;line-height:1.22;font-weight:600;letter-spacing:-.02em}
+p.lead{font-size:16px;line-height:1.65;color:#31403A;margin-top:14px}
+.small{font-size:13.5px;color:var(--dim);line-height:1.6}
+.rule{height:1px;background:var(--line);margin:24px 0}
+h2{font-size:15px;font-weight:600;margin-bottom:12px}
+button{font:inherit;cursor:pointer;border:none}
+.target{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);
+ border-radius:5px;padding:15px 16px;margin-bottom:10px;transition:border-color .15s,background .15s}
+.target.sel{border-color:var(--tritc);background:#FFF4F8}
+.target .t{font-size:17px;font-weight:600}
+.target .d{font-size:13.5px;color:var(--dim);margin-top:5px;line-height:1.5}
+.go{width:100%;background:var(--ink);color:var(--ground);padding:17px;border-radius:5px;
+ font-size:17px;font-weight:600;margin-top:8px;transition:opacity .2s}
+.go:disabled{opacity:.3}
+.ghost{background:none;color:var(--dim);font-size:14px;text-decoration:underline;padding:10px 0;width:100%;margin-top:18px}
+.explain{background:#fff;border:1px solid var(--line);border-radius:5px;padding:16px;margin-top:16px}
+.explain .h{font-size:14px;font-weight:600;margin-bottom:8px}
+.explain .r{display:flex;gap:14px;align-items:center;margin-top:10px}
+.explain .txt{font-size:13px;color:#31403A;line-height:1.55}
+.hero{background:#fff;border:1px solid var(--line);border-radius:5px;padding:12px;margin-top:16px;text-align:center}
+.hero canvas{display:block;margin:0 auto}
+.hero .cap{font-size:12px;color:var(--dim);margin-top:4px}
+#dots{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin:18px 0 22px}
+#dots i{aspect-ratio:1;display:block;transition:opacity .45s ease,transform .45s ease}
+#dots canvas{width:100%;height:100%;display:block}
+#dots i.out{opacity:.13;transform:scale(.55)}
+.counter{display:flex;align-items:baseline;gap:9px}
+.counter b{font-size:52px;font-weight:700;letter-spacing:-.03em;color:var(--tritc);line-height:1}
+.counter span{font-size:15px;color:var(--dim)}
+.step{display:flex;gap:11px;align-items:baseline;font-size:15px;padding:9px 0;opacity:.25;
+ transition:opacity .3s;border-bottom:1px solid var(--line)}
+.step.act{opacity:1}
+.step .n{width:16px;flex:0 0 16px;font-size:12px;color:var(--dim)}
+.step .nm{font-weight:600}
+.step .sd{font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.45}
+.step .cut{margin-left:auto;color:var(--tritc);font-weight:600;font-size:13.5px;white-space:nowrap}
+.rows{margin-top:10px}
+.row10{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.row10 canvas{flex:0 0 62px;width:62px;height:62px;display:block}
+.row10 .meta{flex:1;min-width:0}
+.row10 .id{font-size:14.5px;font-weight:600}
+.row10 .seq{font-size:11px;color:var(--dim);letter-spacing:.02em;margin-top:3px;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row10 .sc{text-align:right;font-size:13px;line-height:1.4;flex:0 0 84px}
+.row10 .sc b{font-size:15px}
+.badge{display:inline-block;background:var(--tritc);color:#fff;font-size:10px;padding:2px 6px;
+ border-radius:3px;margin-left:6px;vertical-align:1px}
+.bill{background:var(--ink);color:var(--ground);border-radius:5px;padding:22px;margin-top:26px}
+.bill .row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;
+ border-bottom:1px solid #2C3A32;font-size:15px}
+.bill .row:last-of-type{border:none}
+.bill .row b{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.bill .cap{font-size:13px;color:#93A69B;margin-top:16px;line-height:1.65}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="chips"><i style="background:#2743C4"></i><i style="background:#17914F"></i><i style="background:#CC1D66"></i></div>
+
+<section id="s1">
+  <h1>你來當一次<br>AI 科學家。</h1>
+  <p class="lead"><b>致病的蛋白質是一把鎖。</b>你要設計一把鑰匙插進去，讓它轉不動。<br><br>
+  AI 一口氣畫出一百把鑰匙 ── 但哪一把真的插得進去？六道關卡幫你刷掉不行的。</p>
+
+  <div class="explain">
+    <div class="h">先講清楚：一個「設計」是什麼</div>
+    <div class="r"><canvas id="demoGlyph" width="180" height="180" style="width:90px;height:90px;flex:0 0 90px"></canvas>
+      <div class="txt">就是<b>一條胺基酸序列</b>，加上它捲成的 3D 形狀。<br>
+      <b>彈簧</b>是螺旋，<b>扁片</b>是摺板 ── 生物學家畫蛋白質就是這樣畫的。<br>
+      <span style="color:var(--dim)">等一下格子裡每一個，都是不同的形狀。</span></div></div>
+  </div>
+
+  <div class="rule"></div>
+  <h2>選一把鎖</h2>
+  <div id="targets"></div>
+  <button class="go" id="run" disabled>畫出一百把鑰匙</button>
+  <p class="small" style="margin-top:14px">形狀是程序生成的示意圖，不是真實 PDB 結構。數字是模擬的。不收集任何資料。</p>
+</section>
+
+<section id="s2" class="hide">
+  <h1 id="s2t" style="font-size:23px"></h1>
+  <div class="hero"><canvas id="tgt" width="520" height="360" style="width:260px;height:180px"></canvas>
+    <div class="cap" id="tgtcap"></div></div>
+  <div class="counter" style="margin-top:18px"><b class="num" id="cnt">100</b><span id="cntlbl">個設計還活著</span></div>
+  <div id="dots"></div>
+  <div id="steps"></div>
+  <button class="go hide" id="toResult" style="margin-top:22px">看活下來的十個</button>
+</section>
+
+<section id="s3" class="hide">
+  <h1 style="font-size:23px">活下來的十個</h1>
+  <p class="small" style="margin-top:10px">每一個都是不同的形狀、不同的序列。<br>
+  <b>結合信心</b>：AI 覺得它真的黏得住的機率，<b>越大越好</b>。<br>
+  <b>親和力</b>：要多稀還黏得住，<b>越小越好</b>。</p>
+  <div class="rows" id="rows"></div>
+  <div class="bill">
+    <div class="row"><span>電腦運算時間</span><b class="num">35 分鐘</b></div>
+    <div class="row"><span>運算成本</span><b class="num">$8</b></div>
+    <div class="cap">注意：這只是電腦時間。從你按下按鈕到看到這張表 ── 不包含後面把它做出來、測試的好幾週。真正貴的一直都是那一段。</div>
+  </div>
+  <div class="rule"></div>
+  <p class="lead" style="font-size:15.5px">這一百條序列，<b>自然界從來沒有出現過</b> ── 這叫 de novo 設計，從一片空白畫出來的。<br><br>
+  <b>接下來還是要做實驗。</b>機器會把第一名合成出來（1–3 週）、純化、加到活細胞上測試，再把結果餵回模型。十個裡真的有效的通常只有一小部分 ── 篩掉九十個的價值，是把實驗次數從一百次降到十次。</p>
+  <button class="ghost" onclick="location.reload()">換一把鎖再玩一次</button>
+</section>
+
+<script>
+/* ---- shared 3D protein cartoon renderer (no libraries) ---- */
+function rng(sd){let a=sd>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);
+ t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+const V={
+ sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],
+ add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
+ mul:(a,s)=>[a[0]*s,a[1]*s,a[2]*s],
+ dot:(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],
+ cross:(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
+ norm:v=>{const l=Math.hypot(v[0],v[1],v[2])||1;return[v[0]/l,v[1]/l,v[2]/l]}
+};
+
+/* build a 3D backbone: alternating secondary-structure elements joined by loops */
+function buildChain(seed,rich){
+  const r=rng(seed), els=[];
+  let pos=[0,0,0], dir=V.norm([r()*2-1,r()*2-1,(r()*2-1)*0.7]);
+  const n=rich?(5+Math.floor(r()*3)):(3+Math.floor(r()*2));
+  for(let i=0;i<n;i++){
+    const type=r()<0.55?'helix':'sheet';
+    const len=type==='helix'?(15+r()*9):(11+r()*6);
+    const b=V.add(pos,V.mul(dir,len));
+    els.push({type,a:pos,b});
+    pos=b;
+    // fold back toward the core so the chain stays globular, like a real domain
+    const pull=V.mul(pos,-0.02-Math.hypot(...pos)*0.008);
+    const nd=V.norm([dir[0]*0.15+pull[0]+(r()*2-1)*1.3,
+                     dir[1]*0.15+pull[1]+(r()*2-1)*1.3,
+                     dir[2]*0.15+pull[2]+(r()*2-1)*1.0]);
+    const le=V.add(pos,V.mul(nd,4.5+r()*4));
+    els.push({type:'loop',a:pos,b:le});
+    pos=le; dir=nd;
+  }
+  return els;
+}
+
+/* sample points along one element */
+function elPoints(el,seed,steps){
+  const {type,a,b}=el, ax=V.sub(b,a), L=Math.hypot(...ax)||1, u=V.norm(ax);
+  let ref=Math.abs(u[1])<0.9?[0,1,0]:[1,0,0];
+  const s1=V.norm(V.cross(u,ref)), s2=V.cross(u,s1);
+  const pts=[];
+  if(type==='helix'){
+    const turns=Math.max(1.6,L/5.6), rad=3.5, N=steps||Math.max(14,Math.round(turns*8));
+    for(let i=0;i<=N;i++){
+      const f=i/N, ang=f*turns*Math.PI*2;
+      pts.push(V.add(V.add(a,V.mul(u,L*f)),
+        V.add(V.mul(s1,Math.cos(ang)*rad),V.mul(s2,Math.sin(ang)*rad))));
+    }
+  } else {
+    const N=steps||(type==='loop'?6:5);
+    const bend=type==='loop'?V.mul(s1,2.0):[0,0,0];
+    for(let i=0;i<=N;i++){
+      const f=i/N;
+      pts.push(V.add(V.add(a,V.mul(ax,f)),V.mul(bend,Math.sin(f*Math.PI))));
+    }
+  }
+  return {pts,side:s1,up:s2,u};
+}
+
+/* build quads for the whole chain */
+function chainQuads(els,seed,rich){
+  const quads=[], SIDES=rich?7:5;
+  els.forEach((el,ei)=>{
+    const {pts,side,up}=elPoints(el,seed);
+    if(el.type==='sheet'){
+      // flat ribbon with arrowhead
+      const hw=3.9, th=1.05, n=pts.length-1;
+      const ring=i=>{
+        const f=i/n;
+        let w=hw;
+        if(f>0.62) w = f<0.72 ? hw*2.0 : hw*2.0*(1-(f-0.72)/0.28);
+        return [V.add(V.add(pts[i],V.mul(side,w)),V.mul(up,th)),
+                V.add(V.add(pts[i],V.mul(side,w)),V.mul(up,-th)),
+                V.add(V.add(pts[i],V.mul(side,-w)),V.mul(up,-th)),
+                V.add(V.add(pts[i],V.mul(side,-w)),V.mul(up,th))];
+      };
+      let prev=ring(0);
+      for(let i=1;i<=n;i++){const cur=ring(i);
+        for(let k=0;k<4;k++){const k2=(k+1)%4;quads.push([prev[k],cur[k],cur[k2],prev[k2]])}
+        prev=cur;}
+    } else {
+      const rad=el.type==='loop'?(rich?1.05:1.5):(rich?1.62:2.15);
+      // parallel-transport tube
+      let t0=V.norm(V.sub(pts[1],pts[0]));
+      let nrm=Math.abs(t0[1])<0.9?V.norm(V.cross(t0,[0,1,0])):V.norm(V.cross(t0,[1,0,0]));
+      let prev=null;
+      for(let i=0;i<pts.length;i++){
+        const t=V.norm(V.sub(pts[Math.min(i+1,pts.length-1)],pts[Math.max(i-1,0)]));
+        nrm=V.norm(V.sub(nrm,V.mul(t,V.dot(nrm,t))));
+        const bn=V.cross(t,nrm), ring=[];
+        for(let k=0;k<SIDES;k++){
+          const ang=k/SIDES*Math.PI*2;
+          ring.push(V.add(pts[i],V.add(V.mul(nrm,Math.cos(ang)*rad),V.mul(bn,Math.sin(ang)*rad))));
+        }
+        if(prev)for(let k=0;k<SIDES;k++){const k2=(k+1)%SIDES;
+          quads.push([prev[k],ring[k],ring[k2],prev[k2]])}
+        prev=ring;
+      }
+    }
+  });
+  return quads;
+}
+
+/* centre + scale to unit box */
+function fitQuads(quads){
+  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
+  quads.forEach(q=>q.forEach(p=>{for(let i=0;i<3;i++){if(p[i]<mn[i])mn[i]=p[i];if(p[i]>mx[i])mx[i]=p[i]}}));
+  const c=[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2];
+  const s=1/Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2],1);
+  return quads.map(q=>q.map(p=>[(p[0]-c[0])*s,(p[1]-c[1])*s,(p[2]-c[2])*s]));
+}
+
+function makeMol(seed,rich){return fitQuads(chainQuads(buildChain(seed,rich),seed,rich))}
+
+const LIGHT=V.norm([-0.45,0.75,0.62]);
+function rot3(p,rx,ry){
+  let [x,y,z]=p;
+  let c=Math.cos(ry),s=Math.sin(ry); let x1=x*c+z*s, z1=-x*s+z*c;
+  c=Math.cos(rx);s=Math.sin(rx); let y1=y*c-z1*s, z2=y*s+z1*c;
+  return [x1,y1,z2];
+}
+function drawMol(ctx,quads,rx,ry,cx,cy,size,rgb,alpha){
+  const D=3.2, out=[];
+  for(let i=0;i<quads.length;i++){
+    const q=quads[i], r=[rot3(q[0],rx,ry),rot3(q[1],rx,ry),rot3(q[2],rx,ry),rot3(q[3],rx,ry)];
+    const z=(r[0][2]+r[1][2]+r[2][2]+r[3][2])/4;
+    const n=V.norm(V.cross(V.sub(r[1],r[0]),V.sub(r[3],r[0])));
+    out.push({r,z,n});
+  }
+  out.sort((a,b)=>a.z-b.z);
+  ctx.globalAlpha=alpha===undefined?1:alpha;
+  ctx.lineJoin='round';
+  for(const o of out){
+    let l=V.dot(o.n,LIGHT); if(l<0)l=-l*0.35;
+    const sh=0.30+0.78*l, sp=Math.pow(Math.max(0,l),14)*0.5;
+    const R=Math.min(255,rgb[0]*sh+255*sp)|0, G=Math.min(255,rgb[1]*sh+255*sp)|0, B=Math.min(255,rgb[2]*sh+255*sp)|0;
+    ctx.fillStyle='rgb('+R+','+G+','+B+')';
+    ctx.beginPath();
+    for(let k=0;k<4;k++){
+      const p=o.r[k], f=size*D/(p[2]+D);
+      const X=cx+p[0]*f, Y=cy-p[1]*f;
+      k?ctx.lineTo(X,Y):ctx.moveTo(X,Y);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=ctx.fillStyle; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+}
+
+/* ---------- app ---------- */
+const AA='ACDEFGHIKLMNPQRSTVWY';
+const BLUE=[39,67,196], MAG=[204,29,102], SLATE=[92,104,116];
+function seqOf(seed,len){const r=rng(seed*7+3);let s='';for(let i=0;i<len;i++)s+=AA[Math.floor(r()*20)];return s}
+function paint(cv,seed,rgb,rich,rx,ry){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=cv.width,h=cv.height,ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  drawMol(ctx,makeMol(seed,rich),rx===undefined?0.42:rx,ry===undefined?0.9:ry,w/2,h/2,Math.min(w,h)*0.46,rgb);
+}
+
+const TARGETS=[
+  {t:'PD-L1',d:'癌細胞用來讓免疫系統「別看我」的偽裝蛋白。卡住它，免疫細胞就會重新發現腫瘤。',c:'免疫腫瘤'},
+  {t:'IL-6 受體',d:'發炎訊號的接收站。訊號太吵的時候，關節、血管都會出事。',c:'自體免疫'},
+  {t:'Tau 聚集體',d:'在阿茲海默症患者腦中結塊的蛋白。卡住它，阻止它繼續黏成一團。',c:'神經退化'},
+  {t:'流感 HA 莖部',d:'流感病毒少數不太變異的部位。打中這裡，理論上一支疫苗管很多年。',c:'傳染病'},
+];
+const FUNNEL=[
+  ['結構信心度','AI 自己打分：我畫的這形狀，我有多確定它真的長這樣',62],
+  ['跨模型一致性','換另一套 AI 重算一次，兩邊答案像不像',41],
+  ['物理能量','用物理定律算：鑰匙插進鎖，能量上划不划算',28],
+  ['選擇性','人體有兩萬種蛋白。會不會也插得進別的鎖？那就是副作用',19],
+  ['分子動力學','前面都是靜態照片。這步模擬泡在 37 度的水裡晃一下，會不會散掉',13],
+  ['可開發性','現實面：做得出來嗎？會不會黏在試管壁上？放三個月會壞嗎',10],
+];
+
+paint(document.getElementById('demoGlyph'),424242,BLUE,true,0.4,0.7);
+
+let picked=null, SEEDS=[];
+const tw=document.getElementById('targets');
+TARGETS.forEach((x,i)=>{
+  const b=document.createElement('button');b.className='target';
+  b.innerHTML='<div class="t">'+x.t+' <span style="font-size:12px;color:var(--dim);font-weight:400">・'+x.c+'</span></div><div class="d">'+x.d+'</div>';
+  b.onclick=()=>{picked=i;[...tw.children].forEach(c=>c.classList.remove('sel'));b.classList.add('sel');
+    document.getElementById('run').disabled=false};
+  tw.appendChild(b);
+});
+
+document.getElementById('run').onclick=()=>{
+  document.getElementById('s1').classList.add('hide');
+  document.getElementById('s2').classList.remove('hide');
+  document.getElementById('s2t').textContent='目標：'+TARGETS[picked].t;
+  document.getElementById('tgtcap').textContent='目標蛋白 '+TARGETS[picked].t+' ── 這就是那把鎖';
+  window.scrollTo(0,0);
+
+  /* rotating target protein */
+  const tc=document.getElementById('tgt'), tctx=tc.getContext('2d');
+  const tmol=makeMol(picked*5501+77,true);
+  let ang=0;
+  (function spin(){ tctx.clearRect(0,0,tc.width,tc.height);
+    drawMol(tctx,tmol,0.36,ang,tc.width/2,tc.height/2,tc.height*0.62,SLATE);
+    ang+=0.006; requestAnimationFrame(spin); })();
+
+  /* 100 candidates */
+  const d=document.getElementById('dots');
+  const cells=[];
+  for(let i=0;i<100;i++){
+    const seed=picked*9901+i*137+11; SEEDS.push(seed);
+    const el=document.createElement('i');
+    const cv=document.createElement('canvas'); cv.width=76; cv.height=76;
+    el.appendChild(cv); d.appendChild(el); cells.push({cv,seed});
+  }
+  let k=0;
+  (function batch(){ const end=Math.min(100,k+12);
+    for(;k<end;k++) paint(cells[k].cv,cells[k].seed,BLUE,false,0.42,(k%7)*0.8);
+    if(k<100) requestAnimationFrame(batch); else startFunnel(cells);
+  })();
+
+  const sw=document.getElementById('steps');
+  FUNNEL.forEach((f,i)=>{const e=document.createElement('div');e.className='step';e.id='st'+i;
+    e.innerHTML='<span class="n num">'+(i+1)+'</span><span><span class="nm">'+f[0]+
+      '</span><div class="sd">'+f[1]+'</div></span><span class="cut num">'+f[2]+'</span>';sw.appendChild(e)});
+};
+
+function startFunnel(cells){
+  const nodes=[...document.querySelectorAll('#dots i')];
+  let stage=0;
+  const tick=()=>{
+    if(stage>=FUNNEL.length){
+      for(let i=0;i<10;i++) paint(cells[i].cv,cells[i].seed,MAG,false,0.42,(i%7)*0.8);
+      document.getElementById('cntlbl').textContent='個進到實驗室';
+      setTimeout(()=>document.getElementById('toResult').classList.remove('hide'),500);
+      return;
+    }
+    const to=FUNNEL[stage][2];
+    const alive=nodes.filter(n=>!n.classList.contains('out'));
+    for(let i=alive.length-1;i>=to;i--) alive[i].classList.add('out');
+    document.getElementById('st'+stage).classList.add('act');
+    document.getElementById('cnt').textContent=to;
+    stage++; setTimeout(tick,1250);
+  };
+  setTimeout(tick,700);
+}
+
+document.getElementById('toResult').onclick=()=>{
+  document.getElementById('s2').classList.add('hide');
+  document.getElementById('s3').classList.remove('hide');
+  window.scrollTo(0,0);
+  const rows=document.getElementById('rows');
+  const pre=TARGETS[picked].t.slice(0,2).toUpperCase().replace(/[^A-Z0-9]/g,'X');
+  for(let i=0;i<10;i++){
+    const seed=SEEDS[i], r=rng(seed+5);
+    const len=32+Math.floor(r()*38);
+    const ip=(0.93-i*0.037-r()*0.02), kd=(0.4+i*0.9+r()*0.7);
+    const el=document.createElement('div');el.className='row10';
+    const cv=document.createElement('canvas'); cv.width=140; cv.height=140;
+    el.appendChild(cv);
+    const meta=document.createElement('div'); meta.className='meta';
+    meta.innerHTML='<div class="id">'+pre+'-'+(101+Math.floor(r()*880))+
+      (i===0?'<span class="badge">送去合成</span>':'')+'</div>'+
+      '<div class="seq mono">'+len+' aa ・ '+seqOf(seed,14)+'…</div>';
+    el.appendChild(meta);
+    const sc=document.createElement('div'); sc.className='sc';
+    sc.innerHTML='<b class="num">'+ip.toFixed(2)+'</b><br><span class="num" style="color:var(--dim)">'+kd.toFixed(1)+' nM</span>';
+    el.appendChild(sc);
+    rows.appendChild(el);
+    paint(cv,seed,MAG,true,0.4,(i%7)*0.85);
+  }
+};
+</script>
+</body>
+</html>
