@@ -77,8 +77,7 @@ button{font:inherit;cursor:pointer;border:none}
 
 <section id="s1">
   <h1>你來當一次<br>AI 科學家。</h1>
-  <p class="lead"><b>致病的蛋白質是一把鎖。</b>你要設計一把鑰匙插進去，讓它轉不動。<br><br>
-  AI 一口氣畫出一百把鑰匙 ── 但哪一把真的插得進去？六道關卡幫你刷掉不行的。</p>
+  <p class="lead"><b>致病的蛋白質是一個插座。</b>它本來會跟另一個東西插在一起，然後做壞事。<br>你要設計一個<b>假插頭</b>，先佔住那個孔。<br><br>AI 一口氣畫出一百個 ── 但哪一個真的塞得住？六道關卡幫你刷掉不行的。</p>
 
   <div class="explain">
     <div class="h">先講清楚：一個「設計」是什麼</div>
@@ -89,9 +88,9 @@ button{font:inherit;cursor:pointer;border:none}
   </div>
 
   <div class="rule"></div>
-  <h2>選一把鎖</h2>
+  <h2>選一個插座</h2>
   <div id="targets"></div>
-  <button class="go" id="run" disabled>畫出一百把鑰匙</button>
+  <button class="go" id="run" disabled>畫出一百個候選</button>
   <p class="small" style="margin-top:14px">形狀是程序生成的示意圖，不是真實 PDB 結構。數字是模擬的。不收集任何資料。</p>
 </section>
 
@@ -119,7 +118,7 @@ button{font:inherit;cursor:pointer;border:none}
   <div class="rule"></div>
   <p class="lead" style="font-size:15.5px">這一百條序列，<b>自然界從來沒有出現過</b> ── 這叫 de novo 設計，從一片空白畫出來的。<br><br>
   <b>接下來還是要做實驗。</b>機器會把第一名合成出來（1–3 週）、純化、加到活細胞上測試，再把結果餵回模型。十個裡真的有效的通常只有一小部分 ── 篩掉九十個的價值，是把實驗次數從一百次降到十次。</p>
-  <button class="ghost" onclick="location.reload()">換一把鎖再玩一次</button>
+  <button class="ghost" onclick="location.reload()">換一個插座再玩一次</button>
 </section>
 
 <script>
@@ -284,16 +283,16 @@ function paint(cv,seed,rgb,rich,rx,ry){
 }
 
 const TARGETS=[
-  {t:'PD-L1',d:'癌細胞用來讓免疫系統「別看我」的偽裝蛋白。卡住它，免疫細胞就會重新發現腫瘤。',c:'免疫腫瘤'},
+  {t:'PD-L1',d:'癌細胞用來讓免疫系統「別看我」的偽裝蛋白。塞住它，免疫細胞就會重新發現腫瘤。',c:'免疫腫瘤'},
   {t:'IL-6 受體',d:'發炎訊號的接收站。訊號太吵的時候，關節、血管都會出事。',c:'自體免疫'},
-  {t:'Tau 聚集體',d:'在阿茲海默症患者腦中結塊的蛋白。卡住它，阻止它繼續黏成一團。',c:'神經退化'},
+  {t:'Tau 聚集體',d:'在阿茲海默症患者腦中結塊的蛋白。塞住它，阻止它繼續黏成一團。',c:'神經退化'},
   {t:'流感 HA 莖部',d:'流感病毒少數不太變異的部位。打中這裡，理論上一支疫苗管很多年。',c:'傳染病'},
 ];
 const FUNNEL=[
   ['結構信心度','AI 自己打分：我畫的這形狀，我有多確定它真的長這樣',62],
   ['跨模型一致性','換另一套 AI 重算一次，兩邊答案像不像',41],
-  ['物理能量','用物理定律算：鑰匙插進鎖，能量上划不划算',28],
-  ['選擇性','人體有兩萬種蛋白。會不會也插得進別的鎖？那就是副作用',19],
+  ['物理能量','用物理定律算：插進去之後，能量上划不划算',28],
+  ['選擇性','人體有兩萬種蛋白。會不會也插得進別的插座？那就是副作用',19],
   ['分子動力學','前面都是靜態照片。這步模擬泡在 37 度的水裡晃一下，會不會散掉',13],
   ['可開發性','現實面：做得出來嗎？會不會黏在試管壁上？放三個月會壞嗎',10],
 ];
@@ -313,8 +312,8 @@ TARGETS.forEach((x,i)=>{
 document.getElementById('run').onclick=()=>{
   document.getElementById('s1').classList.add('hide');
   document.getElementById('s2').classList.remove('hide');
-  document.getElementById('s2t').textContent='目標：'+TARGETS[picked].t;
-  document.getElementById('tgtcap').textContent='目標蛋白 '+TARGETS[picked].t+' ── 這就是那把鎖';
+  document.getElementById('s2t').textContent='目標插座：'+TARGETS[picked].t;
+  document.getElementById('tgtcap').textContent='目標蛋白 '+TARGETS[picked].t+' ── 這就是那個插座';
   window.scrollTo(0,0);
 
   /* rotating target protein */
